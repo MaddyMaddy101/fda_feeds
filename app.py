@@ -31,17 +31,19 @@ def save_important_entries(entries):
 
 # Streamlit App
 def main():
+    # Use full-page layout
+    st.set_page_config(layout="wide")
+
+    # Load filtered and important entries
+    filtered_entries = load_filtered_entries()
+    important_entries = load_important_entries()
+
     # Set up layout: two columns (left for filtered entries, right for important entries)
     col1, col2 = st.columns([2, 1])  # Wider left column
 
     with col1:
         st.title("Filtered RSS Feeds")
         st.write("This app allows you to review and mark important RSS feed entries.")
-
-        # Load filtered entries
-        filtered_entries = load_filtered_entries()
-        # Load important entries
-        important_entries = load_important_entries()
 
         # Section to display filtered entries
         st.subheader("Filtered Entries")
@@ -54,10 +56,13 @@ def main():
                 st.markdown(f"**Summary:** {entry['summary']}")
                 st.markdown(f"**Matched Keywords:** {', '.join(entry.get('keywords', []))}")
 
-                # Checkbox to mark the entry as important
+                # Checkbox to mark/unmark the entry as important
                 if st.checkbox("Mark as important", key=f"{entry['link']}_{idx}"):  # Unique key
                     if entry not in important_entries:
                         important_entries.append(entry)
+                else:
+                    if entry in important_entries:
+                        important_entries.remove(entry)
 
                 st.write("---")
 
