@@ -15,7 +15,7 @@ PAGE_URLS = [
     "https://www.biopharmadive.com/",
     "https://www.fiercebiotech.com/fiercebiotechcom/rss-feeds",
     "https://www.sciencedaily.com/",
-    "https://endpts.com/channel/news-briefing/"
+    "https://endpts.com/channel/news-briefing/",
 ]
 
 # Load keywords dynamically from keywords.json
@@ -28,7 +28,7 @@ def load_keywords():
         print(f"Keywords file not found: {KEYWORDS_FILE}. Using default keywords.")
         return [
             "CDx", "companion diagnostics", "FDA approval", "biomarker selection",
-            "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology"
+            "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology",
         ]
 
 KEYWORDS = load_keywords()
@@ -40,10 +40,17 @@ OUTPUT_MARKDOWN = "Filtered-Feeds.md"
 # Set maximum scraping depth
 MAX_DEPTH = 2
 
-def extract_rss_links(page_url, depth=1):
+def extract_rss_links(page_url, depth=1, visited=None):
     """Recursively extracts RSS feed links up to MAX_DEPTH levels."""
     if depth > MAX_DEPTH:
         return []
+
+    if visited is None:
+        visited = set()
+
+    if page_url in visited:
+        return []
+    visited.add(page_url)
 
     try:
         response = requests.get(page_url, timeout=10)
@@ -56,13 +63,12 @@ def extract_rss_links(page_url, depth=1):
             href = tag["href"]
             if "rss" in href.lower():  # Filter links containing "rss"
                 full_url = urljoin(page_url, href)  # Resolve relative URLs
-                if full_url not in rss_links:
-                    rss_links.append(full_url)
+                rss_links.append(full_url)
 
         # Recursively scrape linked pages for deeper layers
         next_links = [urljoin(page_url, a["href"]) for a in soup.find_all("a", href=True)]
         for link in next_links:
-            rss_links.extend(extract_rss_links(link, depth + 1))
+            rss_links.extend(extract_rss_links(link, depth + 1, visited))
 
         return list(set(rss_links))  # Remove duplicates
 
@@ -74,7 +80,7 @@ def fetch_and_filter_feeds(rss_urls):
     """Fetches and filters RSS feeds based on specified keywords."""
     filtered_entries = []
     all_extracted_rss = rss_urls  # Keep track of all RSS links
-    
+
     # Compile regular expressions for whole-word matching of each keyword
     keyword_patterns = [re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE) for keyword in KEYWORDS]
 
@@ -100,7 +106,7 @@ def fetch_and_filter_feeds(rss_urls):
                         "summary": summary,
                         "link": link,
                         "published": published,
-                        "keywords": matching_keywords  # Add matching keywords
+                        "keywords": matching_keywords,  # Add matching keywords
                     })
 
         except Exception as e:
@@ -108,7 +114,6 @@ def fetch_and_filter_feeds(rss_urls):
 
     # Debug before saving JSON
     print(f"Filtered Entries to save: {len(filtered_entries)} entries")
-    print(filtered_entries)
 
     # Save filtered feeds to a JSON file
     try:
@@ -147,9 +152,12 @@ if __name__ == "__main__":
     # Step 1: Extract RSS feed links from the provided URLs
     all_rss_urls = []
     for page_url in PAGE_URLS:
-        rss_links = extract_rss_links(page_url)
-        print(f"RSS links found on {page_url}: {rss_links}")
-        all_rss_urls.extend(rss_links)
+        try:
+            rss_links = extract_rss_links(page_url)
+            print(f"RSS links found on {page_url}: {rss_links}")
+            all_rss_urls.extend(rss_links)
+        except Exception as e:
+            print(f"Error extracting links from {page_url}: {e}")
 
     # Step 2: Fetch and filter RSS feeds
     fetch_and_filter_feeds(all_rss_urls)
