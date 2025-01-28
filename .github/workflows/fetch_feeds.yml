@@ -1,4 +1,4 @@
-name: Fetch and Update Wiki
+name: Fetch, Scrape, and Update Wiki
 
 on:
   schedule:
@@ -19,16 +19,22 @@ jobs:
           python-version: '3.x'
 
       - name: Install Dependencies
-        run: pip install feedparser
+        run: |
+          pip install feedparser
+          pip install beautifulsoup4
+          pip install requests
 
-      - name: Run Feed Fetcher
+      - name: Run Feed Fetcher and Scraper
         run: python fetch_feeds.py
+
+      - name: Debug Workspace Files
+        run: ls -R  # Debug: List all files in the workspace
 
       - name: Checkout Wiki Repository
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          git clone https://github-actions:${GH_PAT}@github.com/Tundrawenwen/fda_feeds.wiki.git wiki-repo
+          git clone https://github-actions:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.wiki.git wiki-repo
 
       - name: Copy Updated Wiki File
         run: |
@@ -43,4 +49,4 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git add Filtered-Feeds.md
           git commit -m "Updated filtered feeds in Wiki" || echo "No changes to commit"
-          git push https://github-actions:${GH_PAT}@github.com/Tundrawenwen/fda_feeds.wiki.git
+          git push https://github-actions:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.wiki.git
