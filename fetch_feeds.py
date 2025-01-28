@@ -6,6 +6,7 @@ from datetime import datetime
 RSS_FEEDS = [
     "https://www.fda.gov/about-fda/contact-fda/subscribe-podcasts-and-news-feeds",
     "https://www.genomeweb.com/rss-feeds",
+    "https://www.genomeweb.com/section/rss/news"
     "https://www.360dx.com/?_ga=2.75407509.662637671.1738042591-1931528450.1736367524",
     "https://www.biocentury.com/home",
     "https://www.biopharmadive.com/",
