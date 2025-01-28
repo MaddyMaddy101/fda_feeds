@@ -27,7 +27,7 @@ OUTPUT_JSON = "filtered_feeds.json"
 OUTPUT_MARKDOWN = "Filtered-Feeds.md"
 
 # Set maximum scraping depth
-MAX_DEPTH = 3
+MAX_DEPTH = 2
 
 def extract_rss_links(page_url, depth=1):
     """Recursively extracts RSS feed links up to MAX_DEPTH levels."""
