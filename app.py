@@ -21,7 +21,6 @@ def load_filtered_entries():
         with open(FILTERED_JSON_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
-        st.warning(f"No filtered feed file found: {FILTERED_JSON_FILE}")
         return []
 
 # Load important entries
@@ -46,12 +45,11 @@ def save_keywords(keywords):
 def fetch_feeds():
     try:
         result = subprocess.run(["python", "fetch_feeds.py"], capture_output=True, text=True, check=True)
-        st.success("Feeds successfully updated!")
-        st.write(result.stdout)
+        st.session_state["fetch_status"] = "success"
+        st.session_state["fetch_output"] = result.stdout
     except subprocess.CalledProcessError as e:
-        st.error("An error occurred while fetching feeds.")
-        st.write(e.stdout)
-        st.write(e.stderr)
+        st.session_state["fetch_status"] = "error"
+        st.session_state["fetch_output"] = e.stderr
 
 # Load keywords
 def load_keywords():
@@ -65,6 +63,11 @@ def load_keywords():
 def main():
     # Use full-page layout
     st.set_page_config(layout="wide")
+
+    # Initialize session state
+    if "fetch_status" not in st.session_state:
+        st.session_state["fetch_status"] = None
+        st.session_state["fetch_output"] = ""
 
     # Set up layout: two columns (left for filtered entries, right for important entries)
     col1, col2 = st.columns([2, 1])  # Wider left column
@@ -82,23 +85,17 @@ def main():
             placeholder="e.g., biomarker, FDA approval, KRAS",
         )
         if st.button("Update and Fetch Feeds"):
-            # Save updated keywords from user input
             new_keywords = [kw.strip() for kw in keywords_input.split(",") if kw.strip()]
             save_keywords(new_keywords)  # Save to keywords.json
-        
-            # Trigger fetch_feeds.py
-            try:
-                result = subprocess.run(["python", "fetch_feeds.py"], capture_output=True, text=True, check=True)
-                st.success("Feeds successfully updated!")
-                st.write(result.stdout)  # Log the output of fetch_feeds.py
-            except subprocess.CalledProcessError as e:
-                st.error("An error occurred while fetching feeds.")
-                st.write(e.stdout)
-                st.write(e.stderr)
-        
-        # Reload the page to reflect the updates
-        st.experimental_rerun()
+            fetch_feeds()  # Trigger fetch_feeds.py
 
+        # Show fetch status
+        if st.session_state["fetch_status"] == "success":
+            st.success("Feeds successfully updated!")
+            st.write(st.session_state["fetch_output"])
+        elif st.session_state["fetch_status"] == "error":
+            st.error("An error occurred while fetching feeds.")
+            st.write(st.session_state["fetch_output"])
 
         # Load filtered entries
         filtered_entries = load_filtered_entries()
