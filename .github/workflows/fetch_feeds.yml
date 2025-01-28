@@ -28,7 +28,7 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          git clone https://github-actions:${GH_PAT}@github.com/${{ github.repository }}.wiki.git wiki-repo
+          git clone https://github-actions:${GH_PAT}@github.com/Tundrawenwen/fda_feeds.wiki.git wiki-repo
 
       - name: Copy Updated Wiki File
         run: |
@@ -43,4 +43,4 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git add Filtered-Feeds.md
           git commit -m "Updated filtered feeds in Wiki" || echo "No changes to commit"
-          git push https://github-actions:${GH_PAT}@github.com/${{ github.repository }}.wiki.git
+          git push https://github-actions:${GH_PAT}@github.com/Tundrawenwen/fda_feeds.wiki.git
