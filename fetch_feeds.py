@@ -1,6 +1,5 @@
 import feedparser
 import json
-import os
 from datetime import datetime
 
 # RSS Feeds List
@@ -19,8 +18,9 @@ RSS_FEEDS = [
 KEYWORDS = ["CDx", "companion diagnostics", "FDA approval", "biomarker selection", 
             "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology"]
 
-# Output file
-OUTPUT_FILE = "filtered_feeds.json"
+# Output files
+OUTPUT_JSON = "filtered_feeds.json"
+OUTPUT_MARKDOWN = "Filtered-Feeds.md"
 
 def fetch_and_filter_feeds():
     filtered_entries = []
@@ -47,10 +47,24 @@ def fetch_and_filter_feeds():
             print(f"Error fetching {url}: {e}")
 
     # Save filtered feeds to a JSON file
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(filtered_entries, f, indent=4)
 
-    print(f"Filtered feeds saved to {OUTPUT_FILE}")
+    # Save filtered feeds to a Markdown file
+    with open(OUTPUT_MARKDOWN, "w", encoding="utf-8") as f:
+        f.write("# Filtered RSS Feeds\n\n")
+        f.write(f"**Last Updated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        
+        if filtered_entries:
+            for entry in filtered_entries:
+                f.write(f"### [{entry['title']}]({entry['link']})\n")
+                f.write(f"**Published:** {entry['published']}\n\n")
+                f.write(f"**Summary:** {entry['summary']}\n\n")
+                f.write("---\n\n")
+        else:
+            f.write("No articles matched the specified keywords.\n")
+
+    print(f"Filtered feeds saved to {OUTPUT_JSON} and {OUTPUT_MARKDOWN}")
 
 if __name__ == "__main__":
     fetch_and_filter_feeds()
