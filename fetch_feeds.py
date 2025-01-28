@@ -23,7 +23,7 @@ KEYWORDS = ["CDx", "companion diagnostics", "FDA approval", "biomarker selection
             "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology"]
 
 # DEBUG: Print the filtered entries
-    print(f"Filtered Entries: {filtered_entries}")
+print(f"Filtered Entries: {filtered_entries}")
 
 # Output files
 OUTPUT_JSON = "filtered_feeds.json"
