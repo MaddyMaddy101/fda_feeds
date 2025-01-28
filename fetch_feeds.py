@@ -49,6 +49,7 @@ def extract_rss_links(page_url):
 def fetch_and_filter_feeds(rss_urls):
     """Fetches and filters RSS feeds based on specified keywords."""
     filtered_entries = []
+    all_extracted_rss = rss_urls  # Keep track of all RSS links
     
     # Compile regular expressions for whole-word matching of each keyword
     keyword_patterns = [re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE) for keyword in KEYWORDS]
@@ -84,12 +85,14 @@ def fetch_and_filter_feeds(rss_urls):
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(filtered_entries, f, indent=4)
 
-    # Save filtered feeds to a Markdown file
+    # Save filtered feeds and RSS links to a Markdown file
     with open(OUTPUT_MARKDOWN, "w", encoding="utf-8") as f:
         f.write("# Filtered RSS Feeds\n\n")
         f.write(f"**Last Updated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
         
+        # Section for filtered entries
         if filtered_entries:
+            f.write("## Filtered Entries\n\n")
             for entry in filtered_entries:
                 f.write(f"### [{entry['title']}]({entry['link']})\n")
                 f.write(f"**Published:** {entry['published']}\n\n")
@@ -97,9 +100,14 @@ def fetch_and_filter_feeds(rss_urls):
                 f.write(f"**Matched Keywords:** {', '.join(entry['keywords'])}\n\n")
                 f.write("---\n\n")
         else:
-            f.write("No articles matched the specified keywords.\n")
+            f.write("## Filtered Entries\n\nNo articles matched the specified keywords.\n\n")
+        
+        # Section for all extracted RSS links
+        f.write("## All Extracted RSS Links\n\n")
+        for rss_link in all_extracted_rss:
+            f.write(f"- {rss_link}\n")
 
-    print(f"Filtered feeds saved to {OUTPUT_JSON} and {OUTPUT_MARKDOWN}")
+    print(f"Filtered feeds and RSS links saved to {OUTPUT_JSON} and {OUTPUT_MARKDOWN}")
 
 if __name__ == "__main__":
     # Step 1: Extract RSS feed links from the provided URLs
