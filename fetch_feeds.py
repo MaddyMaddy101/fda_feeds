@@ -68,6 +68,7 @@ def fetch_and_filter_feeds(rss_urls):
     keyword_patterns = [re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE) for keyword in KEYWORDS]
 
     for url in rss_urls:
+        print(f"Processing RSS URL: {url}")  # Debug RSS URL
         try:
             feed = feedparser.parse(url)
             for entry in feed.entries:
@@ -94,9 +95,17 @@ def fetch_and_filter_feeds(rss_urls):
         except Exception as e:
             print(f"Error fetching {url}: {e}")
 
+    # Debug before saving JSON
+    print(f"Filtered Entries to save: {len(filtered_entries)} entries")
+    print(filtered_entries)
+
     # Save filtered feeds to a JSON file
-    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
-        json.dump(filtered_entries, f, indent=4)
+    try:
+        with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
+            json.dump(filtered_entries, f, indent=4)
+        print(f"JSON file saved: {OUTPUT_JSON}")
+    except Exception as e:
+        print(f"Error saving JSON file: {e}")
 
     # Save filtered feeds and RSS links to a Markdown file
     with open(OUTPUT_MARKDOWN, "w", encoding="utf-8") as f:
@@ -119,6 +128,7 @@ def fetch_and_filter_feeds(rss_urls):
         f.write("## All Extracted RSS Links\n\n")
         for rss_link in all_extracted_rss:
             f.write(f"- {rss_link}\n")
+    print(f"Markdown file saved: {OUTPUT_MARKDOWN}")
 
     print(f"Filtered feeds and RSS links saved to {OUTPUT_JSON} and {OUTPUT_MARKDOWN}")
 
