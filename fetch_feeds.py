@@ -3,9 +3,10 @@ from bs4 import BeautifulSoup
 import feedparser
 import json
 import re
+from urllib.parse import urljoin
 from datetime import datetime
 
-# List of page URLs to scrape for RSS feeds
+# Initial page URLs to scrape for RSS feeds
 PAGE_URLS = [
     "https://www.fda.gov/about-fda/contact-fda/subscribe-podcasts-and-news-feeds",
     "https://www.genomeweb.com/rss-feeds",
@@ -25,22 +26,34 @@ KEYWORDS = ["CDx", "companion diagnostics", "FDA approval", "biomarker selection
 OUTPUT_JSON = "filtered_feeds.json"
 OUTPUT_MARKDOWN = "Filtered-Feeds.md"
 
-def extract_rss_links(page_url):
-    """Extracts RSS feed links from a given webpage URL, filtering only links containing 'rss'."""
+# Set maximum scraping depth
+MAX_DEPTH = 4
+
+def extract_rss_links(page_url, depth=1):
+    """Recursively extracts RSS feed links up to MAX_DEPTH levels."""
+    if depth > MAX_DEPTH:
+        return []
+
     try:
-        response = requests.get(page_url)
+        response = requests.get(page_url, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
-        
+
+        # Find RSS links
         rss_links = []
         for tag in soup.find_all(["link", "a"], href=True):
             href = tag["href"]
-            if "rss" in href.lower():  # Check if the link contains 'rss' (case-insensitive)
-                if href.startswith("/"):  # Handle relative URLs
-                    href = page_url + href
-                rss_links.append(href)
-        
-        return rss_links
+            if "rss" in href.lower():  # Filter links containing "rss"
+                full_url = urljoin(page_url, href)  # Resolve relative URLs
+                if full_url not in rss_links:
+                    rss_links.append(full_url)
+
+        # Recursively scrape linked pages for deeper layers
+        next_links = [urljoin(page_url, a["href"]) for a in soup.find_all("a", href=True)]
+        for link in next_links:
+            rss_links.extend(extract_rss_links(link, depth + 1))
+
+        return list(set(rss_links))  # Remove duplicates
 
     except Exception as e:
         print(f"Error fetching {page_url}: {e}")
