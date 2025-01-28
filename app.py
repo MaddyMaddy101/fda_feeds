@@ -2,9 +2,10 @@ import streamlit as st
 import json
 from datetime import datetime
 
-# Filenames
-FILTERED_JSON_FILE = os.path.join(os.path.dirname(__file__), "filtered_feeds.json")
-IMPORTANT_ENTRIES_FILE = os.path.join(os.path.dirname(__file__), "important_entries.json")
+import os
+# Use the current working directory
+FILTERED_JSON_FILE = os.path.join(os.getcwd(), "filtered_feeds.json")
+IMPORTANT_ENTRIES_FILE = os.path.join(os.getcwd(), "important_entries.json")
 
 # Load filtered entries
 def load_filtered_entries():
