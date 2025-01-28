@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import feedparser
 import json
+import re
 from datetime import datetime
 
 # List of page URLs to scrape for RSS feeds
@@ -49,6 +50,9 @@ def fetch_and_filter_feeds(rss_urls):
     """Fetches and filters RSS feeds based on specified keywords."""
     filtered_entries = []
     
+    # Compile regular expressions for whole-word matching of each keyword
+    keyword_patterns = [re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE) for keyword in KEYWORDS]
+
     for url in rss_urls:
         try:
             feed = feedparser.parse(url)
@@ -59,7 +63,10 @@ def fetch_and_filter_feeds(rss_urls):
                 published = entry.get("published", "Unknown Date")
 
                 # Find matching keywords
-                matching_keywords = [keyword for keyword in KEYWORDS if keyword.lower() in title.lower() or keyword.lower() in summary.lower()]
+                matching_keywords = [
+                    keyword for keyword, pattern in zip(KEYWORDS, keyword_patterns)
+                    if pattern.search(title) or pattern.search(summary)
+                ]
 
                 if matching_keywords:
                     filtered_entries.append({
