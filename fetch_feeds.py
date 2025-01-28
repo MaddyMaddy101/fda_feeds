@@ -1,10 +1,10 @@
 import requests
+from bs4 import BeautifulSoup
 import feedparser
 import json
-from bs4 import BeautifulSoup
 from datetime import datetime
 
-# Web pages to scrape for RSS feeds
+# List of page URLs to scrape for RSS feeds
 PAGE_URLS = [
     "https://www.fda.gov/about-fda/contact-fda/subscribe-podcasts-and-news-feeds",
     "https://www.genomeweb.com/rss-feeds",
@@ -25,13 +25,12 @@ OUTPUT_JSON = "filtered_feeds.json"
 OUTPUT_MARKDOWN = "Filtered-Feeds.md"
 
 def extract_rss_links(page_url):
-    """Scrape the specified web page for RSS feed URLs."""
+    """Extracts RSS feed links from a given webpage URL."""
     try:
         response = requests.get(page_url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         
-        # Find RSS links in <link> or <a> tags
         rss_links = []
         for tag in soup.find_all(["link", "a"], href=True):
             href = tag["href"]
@@ -46,11 +45,11 @@ def extract_rss_links(page_url):
         print(f"Error fetching {page_url}: {e}")
         return []
 
-def fetch_and_filter_feeds(rss_feeds):
-    """Fetch RSS feeds, filter them based on keywords, and save results."""
+def fetch_and_filter_feeds(rss_urls):
+    """Fetches and filters RSS feeds based on specified keywords."""
     filtered_entries = []
     
-    for url in rss_feeds:
+    for url in rss_urls:
         try:
             feed = feedparser.parse(url)
             for entry in feed.entries:
@@ -59,13 +58,16 @@ def fetch_and_filter_feeds(rss_feeds):
                 link = entry.get("link", "")
                 published = entry.get("published", "Unknown Date")
 
-                # Check if any keyword is in the title or summary
-                if any(keyword.lower() in title.lower() or keyword.lower() in summary.lower() for keyword in KEYWORDS):
+                # Find matching keywords
+                matching_keywords = [keyword for keyword in KEYWORDS if keyword.lower() in title.lower() or keyword.lower() in summary.lower()]
+
+                if matching_keywords:
                     filtered_entries.append({
                         "title": title,
                         "summary": summary,
                         "link": link,
-                        "published": published
+                        "published": published,
+                        "keywords": matching_keywords  # Add matching keywords
                     })
 
         except Exception as e:
@@ -85,6 +87,7 @@ def fetch_and_filter_feeds(rss_feeds):
                 f.write(f"### [{entry['title']}]({entry['link']})\n")
                 f.write(f"**Published:** {entry['published']}\n\n")
                 f.write(f"**Summary:** {entry['summary']}\n\n")
+                f.write(f"**Matched Keywords:** {', '.join(entry['keywords'])}\n\n")
                 f.write("---\n\n")
         else:
             f.write("No articles matched the specified keywords.\n")
@@ -92,15 +95,12 @@ def fetch_and_filter_feeds(rss_feeds):
     print(f"Filtered feeds saved to {OUTPUT_JSON} and {OUTPUT_MARKDOWN}")
 
 if __name__ == "__main__":
-    # Step 1: Extract RSS feed URLs from the specified web pages
-    all_rss_links = []
+    # Step 1: Extract RSS feed links from the provided URLs
+    all_rss_urls = []
     for page_url in PAGE_URLS:
         rss_links = extract_rss_links(page_url)
-        print(f"RSS links for {page_url}: {rss_links}")
-        all_rss_links.extend(rss_links)
-    
-    # Step 2: Fetch and filter the extracted RSS feeds
-    if all_rss_links:
-        fetch_and_filter_feeds(all_rss_links)
-    else:
-        print("No RSS feeds found.")
+        print(f"RSS links found on {page_url}: {rss_links}")
+        all_rss_urls.extend(rss_links)
+
+    # Step 2: Fetch and filter RSS feeds
+    fetch_and_filter_feeds(all_rss_urls)
