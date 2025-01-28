@@ -82,10 +82,23 @@ def main():
             placeholder="e.g., biomarker, FDA approval, KRAS",
         )
         if st.button("Update and Fetch Feeds"):
+            # Save updated keywords from user input
             new_keywords = [kw.strip() for kw in keywords_input.split(",") if kw.strip()]
-            save_keywords(new_keywords)  # Save updated keywords to file
-            fetch_feeds()  # Trigger fetch_feeds.py
-            st.experimental_rerun()  # Reload Streamlit page
+            save_keywords(new_keywords)  # Save to keywords.json
+        
+            # Trigger fetch_feeds.py
+            try:
+                result = subprocess.run(["python", "fetch_feeds.py"], capture_output=True, text=True, check=True)
+                st.success("Feeds successfully updated!")
+                st.write(result.stdout)  # Log the output of fetch_feeds.py
+            except subprocess.CalledProcessError as e:
+                st.error("An error occurred while fetching feeds.")
+                st.write(e.stdout)
+                st.write(e.stderr)
+        
+        # Reload the page to reflect the updates
+        st.experimental_rerun()
+
 
         # Load filtered entries
         filtered_entries = load_filtered_entries()
