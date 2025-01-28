@@ -18,9 +18,20 @@ PAGE_URLS = [
     "https://endpts.com/channel/news-briefing/"
 ]
 
-# Keywords to filter
-KEYWORDS = ["CDx", "companion diagnostics", "FDA approval", "biomarker selection", 
-            "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology"]
+# Load keywords dynamically from keywords.json
+KEYWORDS_FILE = "keywords.json"
+def load_keywords():
+    try:
+        with open(KEYWORDS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"Keywords file not found: {KEYWORDS_FILE}. Using default keywords.")
+        return [
+            "CDx", "companion diagnostics", "FDA approval", "biomarker selection",
+            "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology"
+        ]
+
+KEYWORDS = load_keywords()
 
 # Output files
 OUTPUT_JSON = "filtered_feeds.json"
