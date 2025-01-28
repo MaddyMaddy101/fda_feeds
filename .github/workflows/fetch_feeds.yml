@@ -26,6 +26,14 @@ jobs:
 
       - name: Run Feed Fetcher and Scraper
         run: python fetch_feeds.py
+        
+      - name: Commit and Push filtered_feeds.json
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add filtered_feeds.json
+          git commit -m "Update filtered_feeds.json"
+          git push
 
       - name: Debug Workspace Files
         run: ls -R  # Debug: List all files in the workspace
