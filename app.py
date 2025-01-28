@@ -3,8 +3,8 @@ import json
 from datetime import datetime
 
 # Filenames
-FILTERED_JSON_FILE = "filtered_feeds.json"  # Output from the fetch script
-IMPORTANT_ENTRIES_FILE = "important_entries.json"  # Persistent storage for marked entries
+FILTERED_JSON_FILE = os.path.join(os.path.dirname(__file__), "filtered_feeds.json")
+IMPORTANT_ENTRIES_FILE = os.path.join(os.path.dirname(__file__), "important_entries.json")
 
 # Load filtered entries
 def load_filtered_entries():
