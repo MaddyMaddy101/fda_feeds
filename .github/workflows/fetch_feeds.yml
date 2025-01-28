@@ -33,7 +33,7 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git add filtered_feeds.json
           git commit -m "Update filtered_feeds.json"
-          git push
+          git push https://github-actions:${{ secrets.GH_PAT }}@github.com/Tundrawenwen/fda_feeds.git
 
       - name: Debug Workspace Files
         run: ls -R  # Debug: List all files in the workspace
