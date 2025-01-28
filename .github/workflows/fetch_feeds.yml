@@ -1,4 +1,4 @@
-name: Fetch and Filter Feeds
+name: Fetch and Update Wiki
 
 on:
   schedule:
@@ -24,10 +24,21 @@ jobs:
       - name: Run Feed Fetcher
         run: python fetch_feeds.py
 
-      - name: Commit and Push Changes
+      - name: Checkout Wiki Repository
         run: |
+          git clone https://github.com/${{ github.repository }}.wiki.git wiki-repo
+
+      - name: Copy Updated Wiki File
+        run: |
+          cp Filtered-Feeds.md wiki-repo/
+
+      - name: Commit and Push Changes to Wiki
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          cd wiki-repo
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add filtered_feeds.json
-          git commit -m "Updated filtered feeds" || echo "No changes to commit"
-          git push
+          git add Filtered-Feeds.md
+          git commit -m "Updated filtered feeds in Wiki" || echo "No changes to commit"
+          git push https://github-actions:${GH_PAT}@github.com/${{ github.repository }}.wiki.git
