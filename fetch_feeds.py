@@ -1,12 +1,13 @@
+import requests
 import feedparser
 import json
+from bs4 import BeautifulSoup
 from datetime import datetime
 
-# RSS Feeds List
-RSS_FEEDS = [
+# Web pages to scrape for RSS feeds
+PAGE_URLS = [
     "https://www.fda.gov/about-fda/contact-fda/subscribe-podcasts-and-news-feeds",
     "https://www.genomeweb.com/rss-feeds",
-    "https://www.genomeweb.com/section/rss/news"
     "https://www.360dx.com/?_ga=2.75407509.662637671.1738042591-1931528450.1736367524",
     "https://www.biocentury.com/home",
     "https://www.biopharmadive.com/",
@@ -23,10 +24,33 @@ KEYWORDS = ["CDx", "companion diagnostics", "FDA approval", "biomarker selection
 OUTPUT_JSON = "filtered_feeds.json"
 OUTPUT_MARKDOWN = "Filtered-Feeds.md"
 
-def fetch_and_filter_feeds():
+def extract_rss_links(page_url):
+    """Scrape the specified web page for RSS feed URLs."""
+    try:
+        response = requests.get(page_url)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        
+        # Find RSS links in <link> or <a> tags
+        rss_links = []
+        for tag in soup.find_all(["link", "a"], href=True):
+            href = tag["href"]
+            if "rss" in href or "feed" in href or href.endswith(".xml"):
+                if href.startswith("/"):  # Handle relative URLs
+                    href = page_url + href
+                rss_links.append(href)
+        
+        return rss_links
+
+    except Exception as e:
+        print(f"Error fetching {page_url}: {e}")
+        return []
+
+def fetch_and_filter_feeds(rss_feeds):
+    """Fetch RSS feeds, filter them based on keywords, and save results."""
     filtered_entries = []
     
-    for url in RSS_FEEDS:
+    for url in rss_feeds:
         try:
             feed = feedparser.parse(url)
             for entry in feed.entries:
@@ -68,4 +92,15 @@ def fetch_and_filter_feeds():
     print(f"Filtered feeds saved to {OUTPUT_JSON} and {OUTPUT_MARKDOWN}")
 
 if __name__ == "__main__":
-    fetch_and_filter_feeds()
+    # Step 1: Extract RSS feed URLs from the specified web pages
+    all_rss_links = []
+    for page_url in PAGE_URLS:
+        rss_links = extract_rss_links(page_url)
+        print(f"RSS links for {page_url}: {rss_links}")
+        all_rss_links.extend(rss_links)
+    
+    # Step 2: Fetch and filter the extracted RSS feeds
+    if all_rss_links:
+        fetch_and_filter_feeds(all_rss_links)
+    else:
+        print("No RSS feeds found.")
