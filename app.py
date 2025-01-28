@@ -1,8 +1,8 @@
 import streamlit as st
 import json
 from datetime import datetime
-
 import os
+
 # Use the current working directory
 FILTERED_JSON_FILE = os.path.join(os.getcwd(), "filtered_feeds.json")
 IMPORTANT_ENTRIES_FILE = os.path.join(os.getcwd(), "important_entries.json")
@@ -43,14 +43,14 @@ def main():
     if not filtered_entries:
         st.info("No filtered entries to display.")
     else:
-        for entry in filtered_entries:
+        for idx, entry in enumerate(filtered_entries):  # Add index for unique keys
             st.markdown(f"### [{entry['title']}]({entry['link']})")
             st.markdown(f"**Published:** {entry['published']}")
             st.markdown(f"**Summary:** {entry['summary']}")
             st.markdown(f"**Matched Keywords:** {', '.join(entry.get('keywords', []))}")
             
             # Checkbox to mark the entry as important
-            if st.checkbox(f"Mark as important", key=f"{entry['link']}"):
+            if st.checkbox("Mark as important", key=f"{entry['link']}_{idx}"):  # Unique key
                 if entry not in important_entries:
                     important_entries.append(entry)
 
