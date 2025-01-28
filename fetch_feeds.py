@@ -26,7 +26,7 @@ OUTPUT_JSON = "filtered_feeds.json"
 OUTPUT_MARKDOWN = "Filtered-Feeds.md"
 
 def extract_rss_links(page_url):
-    """Extracts RSS feed links from a given webpage URL."""
+    """Extracts RSS feed links from a given webpage URL, filtering only links ending with .rss or .xml."""
     try:
         response = requests.get(page_url)
         response.raise_for_status()
@@ -35,7 +35,7 @@ def extract_rss_links(page_url):
         rss_links = []
         for tag in soup.find_all(["link", "a"], href=True):
             href = tag["href"]
-            if "rss" in href or "feed" in href or href.endswith(".xml"):
+            if href.endswith(".rss") or href.endswith(".xml"):  # Only collect .rss or .xml links
                 if href.startswith("/"):  # Handle relative URLs
                     href = page_url + href
                 rss_links.append(href)
