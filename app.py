@@ -31,45 +31,51 @@ def save_important_entries(entries):
 
 # Streamlit App
 def main():
-    st.title("Filtered RSS Feeds")
-    st.write("This app allows you to review and mark important RSS feed entries.")
+    # Set up layout: two columns (left for filtered entries, right for important entries)
+    col1, col2 = st.columns([2, 1])  # Wider left column
 
-    # Load filtered and important entries
-    filtered_entries = load_filtered_entries()
-    important_entries = load_important_entries()
+    with col1:
+        st.title("Filtered RSS Feeds")
+        st.write("This app allows you to review and mark important RSS feed entries.")
 
-    # Section to display filtered entries
-    st.subheader("Filtered Entries")
-    if not filtered_entries:
-        st.info("No filtered entries to display.")
-    else:
-        for idx, entry in enumerate(filtered_entries):  # Add index for unique keys
-            st.markdown(f"### [{entry['title']}]({entry['link']})")
-            st.markdown(f"**Published:** {entry['published']}")
-            st.markdown(f"**Summary:** {entry['summary']}")
-            st.markdown(f"**Matched Keywords:** {', '.join(entry.get('keywords', []))}")
-            
-            # Checkbox to mark the entry as important
-            if st.checkbox("Mark as important", key=f"{entry['link']}_{idx}"):  # Unique key
-                if entry not in important_entries:
-                    important_entries.append(entry)
+        # Load filtered entries
+        filtered_entries = load_filtered_entries()
+        # Load important entries
+        important_entries = load_important_entries()
 
-            st.write("---")
-    
-    # Save the important entries persistently
-    save_important_entries(important_entries)
+        # Section to display filtered entries
+        st.subheader("Filtered Entries")
+        if not filtered_entries:
+            st.info("No filtered entries to display.")
+        else:
+            for idx, entry in enumerate(filtered_entries):  # Add index for unique keys
+                st.markdown(f"### [{entry['title']}]({entry['link']})")
+                st.markdown(f"**Published:** {entry['published']}")
+                st.markdown(f"**Summary:** {entry['summary']}")
+                st.markdown(f"**Matched Keywords:** {', '.join(entry.get('keywords', []))}")
 
-    # Section to display important entries
-    st.subheader("Important Entries")
-    if not important_entries:
-        st.info("No important entries marked yet.")
-    else:
-        for entry in important_entries:
-            st.markdown(f"### [{entry['title']}]({entry['link']})")
-            st.markdown(f"**Published:** {entry['published']}")
-            st.markdown(f"**Summary:** {entry['summary']}")
-            st.markdown(f"**Matched Keywords:** {', '.join(entry.get('keywords', []))}")
-            st.write("---")
+                # Checkbox to mark the entry as important
+                if st.checkbox("Mark as important", key=f"{entry['link']}_{idx}"):  # Unique key
+                    if entry not in important_entries:
+                        important_entries.append(entry)
+
+                st.write("---")
+
+        # Save the important entries persistently
+        save_important_entries(important_entries)
+
+    with col2:
+        # Section to display important entries
+        st.subheader("Important Entries")
+        if not important_entries:
+            st.info("No important entries marked yet.")
+        else:
+            for entry in important_entries:
+                st.markdown(f"### [{entry['title']}]({entry['link']})")
+                st.markdown(f"**Published:** {entry['published']}")
+                st.markdown(f"**Summary:** {entry['summary']}")
+                st.markdown(f"**Matched Keywords:** {', '.join(entry.get('keywords', []))}")
+                st.write("---")
 
 if __name__ == "__main__":
     main()
