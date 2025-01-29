@@ -19,7 +19,7 @@ PAGE_URLS = [
 ]
 
 # Keywords to filter
-KEYWORDS = ["CDx", "companion diagnostics", "FDA approval", "biomarker selection", 
+KEYWORDS = ["CDx", "companion diagnostics", "biomarker selection", 
             "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology"]
 
 # Output files
