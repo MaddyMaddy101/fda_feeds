@@ -1,19 +1,11 @@
 import streamlit as st
 import json
-import os
-import subprocess
 from datetime import datetime
+import os
 
-# File paths
+# Use the current working directory
 FILTERED_JSON_FILE = os.path.join(os.getcwd(), "filtered_feeds.json")
 IMPORTANT_ENTRIES_FILE = os.path.join(os.getcwd(), "important_entries.json")
-KEYWORDS_FILE = os.path.join(os.getcwd(), "keywords.json")
-
-# Default keywords
-DEFAULT_KEYWORDS = [
-    "CDx", "companion diagnostics", "FDA approval", "biomarker selection",
-    "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology"
-]
 
 # Load filtered entries
 def load_filtered_entries():
@@ -21,6 +13,7 @@ def load_filtered_entries():
         with open(FILTERED_JSON_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
+        st.warning(f"No filtered feed file found: {FILTERED_JSON_FILE}")
         return []
 
 # Load important entries
@@ -36,38 +29,14 @@ def save_important_entries(entries):
     with open(IMPORTANT_ENTRIES_FILE, "w", encoding="utf-8") as f:
         json.dump(entries, f, indent=4)
 
-# Save keywords
-def save_keywords(keywords):
-    with open(KEYWORDS_FILE, "w", encoding="utf-8") as f:
-        json.dump(keywords, f, indent=4)
-
-# Fetch feeds by running fetch_feeds.py
-def fetch_feeds():
-    try:
-        result = subprocess.run(["python", "fetch_feeds.py"], capture_output=True, text=True, check=True)
-        st.session_state["fetch_status"] = "success"
-        st.session_state["fetch_output"] = result.stdout
-    except subprocess.CalledProcessError as e:
-        st.session_state["fetch_status"] = "error"
-        st.session_state["fetch_output"] = e.stderr
-
-# Load keywords
-def load_keywords():
-    try:
-        with open(KEYWORDS_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return DEFAULT_KEYWORDS
-
 # Streamlit App
 def main():
     # Use full-page layout
     st.set_page_config(layout="wide")
 
-    # Initialize session state
-    if "fetch_status" not in st.session_state:
-        st.session_state["fetch_status"] = None
-        st.session_state["fetch_output"] = ""
+    # Load filtered and important entries
+    filtered_entries = load_filtered_entries()
+    important_entries = load_important_entries()
 
     # Set up layout: two columns (left for filtered entries, right for important entries)
     col1, col2 = st.columns([2, 1])  # Wider left column
@@ -75,31 +44,6 @@ def main():
     with col1:
         st.title("Filtered RSS Feeds")
         st.write("This app allows you to review and mark important RSS feed entries.")
-
-        # Section to update keywords
-        st.subheader("Update Keywords")
-        current_keywords = load_keywords()
-        keywords_input = st.text_area(
-            "Enter keywords (comma-separated):",
-            value=", ".join(current_keywords),
-            placeholder="e.g., biomarker, FDA approval, KRAS",
-        )
-        if st.button("Update and Fetch Feeds"):
-            new_keywords = [kw.strip() for kw in keywords_input.split(",") if kw.strip()]
-            save_keywords(new_keywords)  # Save to keywords.json
-            fetch_feeds()  # Trigger fetch_feeds.py
-
-        # Show fetch status
-        if st.session_state["fetch_status"] == "success":
-            st.success("Feeds successfully updated!")
-            st.write(st.session_state["fetch_output"])
-        elif st.session_state["fetch_status"] == "error":
-            st.error("An error occurred while fetching feeds.")
-            st.write(st.session_state["fetch_output"])
-
-        # Load filtered entries
-        filtered_entries = load_filtered_entries()
-        important_entries = load_important_entries()
 
         # Section to display filtered entries
         st.subheader("Filtered Entries")
