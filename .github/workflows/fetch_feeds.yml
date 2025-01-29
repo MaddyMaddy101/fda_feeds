@@ -1,4 +1,4 @@
-name: Fetch, Scrape, and Update Wiki
+name: Fetch and Update Wiki
 
 on:
   schedule:
@@ -9,6 +9,10 @@ jobs:
   fetch-feeds:
     runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
       - name: Set Up Python
         uses: actions/setup-python@v4
         with:
@@ -16,20 +20,10 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install feedparser
-          pip install beautifulsoup4
-          pip install requests
+          pip install requests beautifulsoup4 feedparser
 
-      - name: Run Feed Fetcher and Scraper
+      - name: Run Feed Fetcher
         run: python fetch_feeds.py
-        
-      - name: Commit and Push filtered_feeds.json
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add filtered_feeds.json
-          git commit -m "Update filtered_feeds.json"
-          git push https://github-actions:${{ secrets.GH_PAT }}@github.com/Tundrawenwen/fda_feeds.git
 
       - name: Debug Workspace Files
         run: ls -R  # Debug: List all files in the workspace
@@ -38,7 +32,7 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          git clone https://github-actions:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.wiki.git wiki-repo
+          git clone https://github-actions:${GH_PAT}@github.com/Tundrawenwen/fda_feeds.wiki.git wiki-repo
 
       - name: Copy Updated Wiki File
         run: |
@@ -53,6 +47,4 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git add Filtered-Feeds.md
           git commit -m "Updated filtered feeds in Wiki" || echo "No changes to commit"
-          git push https://github-actions:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.wiki.git
-      - name: List files in the working directory
-        run: ls -al
+          git push https://github-actions:${GH_PAT}@github.com/Tundrawenwen/fda_feeds.wiki.git
