@@ -32,6 +32,17 @@ jobs:
 
       - name: Run Feed Fetcher
         run: python fetch_feeds.py
+        
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+      
+      - name: Commit and Push Changes
+        run: |
+          git add filtered_feeds.json
+          git commit -m "Updating filtered feeds from workflow" || echo "No changes to commit"
+          git push
 
       - name: Debug Workspace Files
         run: ls -R  # Debug: List all files in the workspace
