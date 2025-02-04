@@ -63,24 +63,6 @@
         ]
     },
     {
-        "title": "Natera MRD Study Results Demonstrate Potential to Ressurect Failed Adjuvant Drugs",
-        "summary": "<p><span><span><span>The company analyzed MRD status in samples from a prior failed study, showing a significant benefit from the drug for ctDNA-positive patients.</span></span></span></p>",
-        "link": "https://www.genomeweb.com/cancer/natera-mrd-study-results-demonstrate-potential-ressurect-failed-adjuvant-drugs",
-        "published": "Mon, 27 Jan 2025 15:47:45 EST",
-        "keywords": [
-            "ctDNA"
-        ]
-    },
-    {
-        "title": "FDA Approves Roche Antibody Test as CDx for Enhertu in HER2-Ultralow Breast Cancer Patients",
-        "summary": "<p><span><span><span>The tissue-based test is approved to identify a new classification in HER2 expression designated as HER2-ultralow.</span></span></span></p>",
-        "link": "https://www.360dx.com/cancer/fda-approves-roche-antibody-test-cdx-enhertu-her2-ultralow-breast-cancer-patients",
-        "published": "Fri, 31 Jan 2025 13:22:58 EST",
-        "keywords": [
-            "CDx"
-        ]
-    },
-    {
         "title": "FDA Approves Roche Antibody Test as CDx for Enhertu in HER2-Ultralow Breast Cancer Patients",
         "summary": "<p><span><span><span>The tissue-based test is approved to identify a new classification in HER2 expression designated as HER2-ultralow.</span></span></span></p>",
         "link": "https://www.360dx.com/cancer/fda-approves-roche-antibody-test-cdx-enhertu-her2-ultralow-breast-cancer-patients",
@@ -96,6 +78,15 @@
         "published": "Mon, 27 Jan 2025 15:47:45 EST",
         "keywords": [
             "ctDNA"
+        ]
+    },
+    {
+        "title": "FDA Approves Roche Antibody Test as CDx for Enhertu in HER2-Ultralow Breast Cancer Patients",
+        "summary": "<p><span><span><span>The tissue-based test is approved to identify a new classification in HER2 expression designated as HER2-ultralow.</span></span></span></p>",
+        "link": "https://www.360dx.com/cancer/fda-approves-roche-antibody-test-cdx-enhertu-her2-ultralow-breast-cancer-patients",
+        "published": "Fri, 31 Jan 2025 13:22:58 EST",
+        "keywords": [
+            "CDx"
         ]
     }
 ]
