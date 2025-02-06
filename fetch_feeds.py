@@ -47,13 +47,13 @@ def save_entries(entries):
         json.dump(entries, f, indent=4)
 
 def save_to_excel(entries):
-    """Saves filtered feeds to an Excel file."""
+    """Saves filtered feeds to an Excel file including Title, Link, and Keywords."""
     if not entries:
         print("No data to save in Excel.")
         return
 
     df = pd.DataFrame(entries)
-    df = df[["link", "keywords"]]  # Keep only URL and keywords
+    df = df[["link", "keywords", "title"]]  # Keep URL, Keywords, and Title
     df["keywords"] = df["keywords"].apply(lambda x: ", ".join(x))  # Convert list to string
 
     with pd.ExcelWriter(OUTPUT_EXCEL, engine="xlsxwriter") as writer:
@@ -63,6 +63,7 @@ def save_to_excel(entries):
         # Adjust column widths
         worksheet.set_column("A:A", 60)  # Link
         worksheet.set_column("B:B", 30)  # Keywords
+        worksheet.set_column("C:C", 50)  # Title
 
     print(f"✅ RSS feeds saved to {OUTPUT_EXCEL}")
 
