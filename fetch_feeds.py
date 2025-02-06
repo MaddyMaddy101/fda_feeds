@@ -20,7 +20,7 @@ PAGE_URLS = [
 
 # Keywords to filter
 KEYWORDS = ["CDx", "companion diagnostics", "biomarker selection", 
-            "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology"]
+            "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology","CCR8","Veracyte", "Lymphmark"]
 
 # Output files
 OUTPUT_JSON = "filtered_feeds.json"
