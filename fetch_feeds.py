@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import feedparser
 import json
 import re
+import pandas as pd
 from urllib.parse import urljoin
 from datetime import datetime
 
@@ -24,14 +25,16 @@ KEYWORDS = ["CDx", "companion diagnostics", "biomarker selection",
             "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology",
             "CCR8", "Veracyte", "Lymphmark"]
 
-# Output file
+# Output files
 OUTPUT_JSON = "filtered_feeds.json"
+OUTPUT_MARKDOWN = "Filtered-Feeds.md"
+OUTPUT_EXCEL = "filtered_feeds.xlsx"
 
 # Set maximum scraping depth
 MAX_DEPTH = 2
 
 def load_existing_entries():
-    """Loads existing entries from the JSON file."""
+    """Loads existing RSS feed entries from JSON file."""
     try:
         with open(OUTPUT_JSON, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -39,9 +42,46 @@ def load_existing_entries():
         return []
 
 def save_entries(entries):
-    """Saves the entries to the JSON file."""
+    """Saves the combined RSS entries back to JSON file."""
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(entries, f, indent=4)
+
+def save_to_excel(entries):
+    """Saves filtered feeds to an Excel file."""
+    if not entries:
+        print("No data to save in Excel.")
+        return
+
+    df = pd.DataFrame(entries)
+    df = df[["link", "keywords"]]  # Keep only URL and keywords
+    df["keywords"] = df["keywords"].apply(lambda x: ", ".join(x))  # Convert list to string
+
+    with pd.ExcelWriter(OUTPUT_EXCEL, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False, sheet_name="Filtered Feeds")
+        worksheet = writer.sheets["Filtered Feeds"]
+
+        # Adjust column widths
+        worksheet.set_column("A:A", 60)  # Link
+        worksheet.set_column("B:B", 30)  # Keywords
+
+    print(f"✅ RSS feeds saved to {OUTPUT_EXCEL}")
+
+def update_markdown(entries):
+    """Saves the filtered RSS feeds to a Markdown file for the Wiki."""
+    with open(OUTPUT_MARKDOWN, "w", encoding="utf-8") as f:
+        f.write("# Filtered RSS Feeds\n\n")
+        f.write(f"**Last Updated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        
+        if entries:
+            f.write("## Filtered Entries\n\n")
+            for entry in entries:
+                f.write(f"### [{entry['title']}]({entry['link']})\n")
+                f.write(f"**Published:** {entry['published']}\n\n")
+                f.write(f"**Summary:** {entry['summary']}\n\n")
+                f.write(f"**Matched Keywords:** {', '.join(entry['keywords'])}\n\n")
+                f.write("---\n\n")
+        else:
+            f.write("## No new articles matched the specified keywords.\n\n")
 
 def extract_rss_links(page_url, depth=1):
     """Recursively extracts RSS feed links up to MAX_DEPTH levels."""
@@ -57,10 +97,9 @@ def extract_rss_links(page_url, depth=1):
         rss_links = []
         for tag in soup.find_all(["link", "a"], href=True):
             href = tag["href"]
-            if "rss" in href.lower():  # Filter links containing "rss"
-                full_url = urljoin(page_url, href)  # Resolve relative URLs
-                if full_url not in rss_links:
-                    rss_links.append(full_url)
+            if "rss" in href.lower():
+                full_url = urljoin(page_url, href)
+                rss_links.append(full_url)
 
         # Recursively scrape linked pages for deeper layers
         next_links = [urljoin(page_url, a["href"]) for a in soup.find_all("a", href=True)]
@@ -75,10 +114,10 @@ def extract_rss_links(page_url, depth=1):
 
 def fetch_and_filter_feeds(rss_urls):
     """Fetches and filters RSS feeds based on specified keywords."""
-    existing_entries = load_existing_entries()  # Load previous data
-    existing_links = {entry["link"] for entry in existing_entries}  # Set for fast lookup
+    existing_entries = load_existing_entries()
+    existing_links = {entry["link"] for entry in existing_entries}  # Use a set for fast lookup
 
-    new_entries = []  # Stores new valid entries
+    new_entries = []
     keyword_patterns = [re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE) for keyword in KEYWORDS]
 
     for url in rss_urls:
@@ -96,7 +135,7 @@ def fetch_and_filter_feeds(rss_urls):
                     if pattern.search(title) or pattern.search(summary)
                 ]
 
-                # Only add if it matches the criteria and is not a duplicate
+                # Only add if it matches criteria and is NOT a duplicate
                 if matching_keywords and link not in existing_links:
                     new_entries.append({
                         "title": title,
@@ -113,18 +152,17 @@ def fetch_and_filter_feeds(rss_urls):
     # Combine old and new entries
     updated_entries = existing_entries + new_entries
 
-    # Save updated data
+    # Save the updated list
     save_entries(updated_entries)
+    save_to_excel(updated_entries)  # Save to Excel
+    update_markdown(updated_entries)  # Save to Markdown
 
-    print(f"Added {len(new_entries)} new entries. Total entries: {len(updated_entries)}")
+    print(f"✅ Added {len(new_entries)} new entries. Total entries: {len(updated_entries)}")
 
 if __name__ == "__main__":
-    # Step 1: Extract RSS feed links from the provided URLs
     all_rss_urls = []
     for page_url in PAGE_URLS:
         rss_links = extract_rss_links(page_url)
-        print(f"RSS links found on {page_url}: {rss_links}")
         all_rss_urls.extend(rss_links)
 
-    # Step 2: Fetch and filter RSS feeds
     fetch_and_filter_feeds(all_rss_urls)
