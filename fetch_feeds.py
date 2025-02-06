@@ -16,6 +16,7 @@ PAGE_URLS = [
     "https://www.fiercebiotech.com/fiercebiotechcom/rss-feeds",
     "https://www.sciencedaily.com/",
     "https://endpts.com/channel/news-briefing/"
+    "https://seekingalpha.com/"
 ]
 
 # Keywords to filter
