@@ -37,9 +37,12 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add filtered_feeds.json
+          git add filtered_feeds.json || echo "No filtered feeds to add"
           git commit -m "Updating filtered feeds from workflow" || echo "No changes to commit"
           git push
+
+      - name: Debug Files
+        run: ls -l  # Check if Filtered-Feeds.md exists
 
       - name: Checkout Wiki Repository
         env:
@@ -47,15 +50,19 @@ jobs:
         run: |
           git clone https://github-actions:${GH_PAT}@github.com/Tundrawenwen/fda_feeds.wiki.git wiki-repo
 
-      - name: Copy Updated Wiki File
+      - name: Copy Updated Wiki File (if exists)
         run: |
-          cp Filtered-Feeds.md wiki-repo/
+          if [ -f Filtered-Feeds.md ]; then
+            cp Filtered-Feeds.md wiki-repo/
+          else
+            echo "Filtered-Feeds.md not found, skipping copy."
+          fi
 
       - name: Commit and Push Changes to Wiki
         run: |
           cd wiki-repo
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add Filtered-Feeds.md
+          git add Filtered-Feeds.md || echo "No changes in Wiki"
           git commit -m "Updated filtered feeds in Wiki" || echo "No changes to commit"
-          git push
+          git push || echo "No updates to push"
