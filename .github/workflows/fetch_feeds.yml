@@ -28,7 +28,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install requests beautifulsoup4 feedparser
+          pip install requests beautifulsoup4 feedparser pandas xlsxwriter 
 
       - name: Run Feed Fetcher
         run: python fetch_feeds.py
