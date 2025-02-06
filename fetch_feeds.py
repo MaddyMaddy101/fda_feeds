@@ -15,7 +15,7 @@ PAGE_URLS = [
     "https://www.biopharmadive.com/",
     "https://www.fiercebiotech.com/fiercebiotechcom/rss-feeds",
     "https://www.sciencedaily.com/",
-    "https://endpts.com/channel/news-briefing/"
+    "https://endpts.com/channel/news-briefing/",
     "https://seekingalpha.com/"
 ]
 
