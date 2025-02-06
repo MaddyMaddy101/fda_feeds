@@ -21,14 +21,27 @@ PAGE_URLS = [
 
 # Keywords to filter
 KEYWORDS = ["CDx", "companion diagnostics", "biomarker selection", 
-            "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology","CCR8","Veracyte", "Lymphmark"]
+            "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology",
+            "CCR8", "Veracyte", "Lymphmark"]
 
-# Output files
+# Output file
 OUTPUT_JSON = "filtered_feeds.json"
-OUTPUT_MARKDOWN = "Filtered-Feeds.md"
 
 # Set maximum scraping depth
 MAX_DEPTH = 2
+
+def load_existing_entries():
+    """Loads existing entries from the JSON file."""
+    try:
+        with open(OUTPUT_JSON, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+def save_entries(entries):
+    """Saves the entries to the JSON file."""
+    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
+        json.dump(entries, f, indent=4)
 
 def extract_rss_links(page_url, depth=1):
     """Recursively extracts RSS feed links up to MAX_DEPTH levels."""
@@ -62,10 +75,10 @@ def extract_rss_links(page_url, depth=1):
 
 def fetch_and_filter_feeds(rss_urls):
     """Fetches and filters RSS feeds based on specified keywords."""
-    filtered_entries = []
-    all_extracted_rss = rss_urls  # Keep track of all RSS links
-    
-    # Compile regular expressions for whole-word matching of each keyword
+    existing_entries = load_existing_entries()  # Load previous data
+    existing_links = {entry["link"] for entry in existing_entries}  # Set for fast lookup
+
+    new_entries = []  # Stores new valid entries
     keyword_patterns = [re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE) for keyword in KEYWORDS]
 
     for url in rss_urls:
@@ -83,45 +96,27 @@ def fetch_and_filter_feeds(rss_urls):
                     if pattern.search(title) or pattern.search(summary)
                 ]
 
-                if matching_keywords:
-                    filtered_entries.append({
+                # Only add if it matches the criteria and is not a duplicate
+                if matching_keywords and link not in existing_links:
+                    new_entries.append({
                         "title": title,
                         "summary": summary,
                         "link": link,
                         "published": published,
-                        "keywords": matching_keywords  # Add matching keywords
+                        "keywords": matching_keywords
                     })
+                    existing_links.add(link)  # Add to set to avoid duplicates
 
         except Exception as e:
             print(f"Error fetching {url}: {e}")
 
-    # Save filtered feeds to a JSON file
-    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
-        json.dump(filtered_entries, f, indent=4)
+    # Combine old and new entries
+    updated_entries = existing_entries + new_entries
 
-    # Save filtered feeds and RSS links to a Markdown file
-    with open(OUTPUT_MARKDOWN, "w", encoding="utf-8") as f:
-        f.write("# Filtered RSS Feeds\n\n")
-        f.write(f"**Last Updated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-        
-        # Section for filtered entries
-        if filtered_entries:
-            f.write("## Filtered Entries\n\n")
-            for entry in filtered_entries:
-                f.write(f"### [{entry['title']}]({entry['link']})\n")
-                f.write(f"**Published:** {entry['published']}\n\n")
-                f.write(f"**Summary:** {entry['summary']}\n\n")
-                f.write(f"**Matched Keywords:** {', '.join(entry['keywords'])}\n\n")
-                f.write("---\n\n")
-        else:
-            f.write("## Filtered Entries\n\nNo articles matched the specified keywords.\n\n")
-        
-        # Section for all extracted RSS links
-        f.write("## All Extracted RSS Links\n\n")
-        for rss_link in all_extracted_rss:
-            f.write(f"- {rss_link}\n")
+    # Save updated data
+    save_entries(updated_entries)
 
-    print(f"Filtered feeds and RSS links saved to {OUTPUT_JSON} and {OUTPUT_MARKDOWN}")
+    print(f"Added {len(new_entries)} new entries. Total entries: {len(updated_entries)}")
 
 if __name__ == "__main__":
     # Step 1: Extract RSS feed links from the provided URLs
