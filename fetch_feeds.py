@@ -18,12 +18,13 @@ PAGE_URLS = [
     "https://www.sciencedaily.com/",
     "https://endpts.com/channel/news-briefing/",
     "https://seekingalpha.com/"
+    "https://clinicaltrials.gov/"
 ]
 
 # Keywords to filter
 KEYWORDS = ["CDx", "companion diagnostics", "biomarker selection", 
             "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology",
-            "CCR8", "Veracyte", "Lymphmark"]
+            "CCR8", "Veracyte", "Lymphmark", "MRD", "M-protein" ]
 
 # Output files
 OUTPUT_JSON = "filtered_feeds.json"
