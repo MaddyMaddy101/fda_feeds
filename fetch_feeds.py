@@ -9,7 +9,6 @@ from datetime import datetime
 
 # Initial page URLs to scrape for RSS feeds
 PAGE_URLS = [
-    "https://www.fda.gov/about-fda/contact-fda/subscribe-podcasts-and-news-feeds",
     "https://www.genomeweb.com/rss-feeds",
     "https://www.360dx.com/?_ga=2.75407509.662637671.1738042591-1931528450.1736367524",
     "https://www.biocentury.com/home",
@@ -22,9 +21,7 @@ PAGE_URLS = [
 ]
 
 # Keywords to filter
-KEYWORDS = ["CDx", "companion diagnostics", "biomarker selection", 
-            "predictive biomarker", "KRAS", "PD-L1", "PIK3CA", "NFL", "ctDNA", "digital pathology",
-            "CCR8", "Veracyte", "Lymphmark", "MRD", "M-protein" ]
+KEYWORDS = ["CDx", "companion diagnostics", "companion diagnostic"]
 
 # Output files
 OUTPUT_JSON = "filtered_feeds.json"
