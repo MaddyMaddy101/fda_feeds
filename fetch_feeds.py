@@ -17,11 +17,11 @@ PAGE_URLS = [
     "https://www.sciencedaily.com/",
     "https://endpts.com/channel/news-briefing/",
     "https://seekingalpha.com/",
-    "https://clinicaltrials.gov/"
+    "https://clinicaltrials.gov/find-studies/rss"
 ]
 
 # Keywords to filter
-KEYWORDS = ["CDx", "companion diagnostics", "companion diagnostic"]
+KEYWORDS = ["CDx", "companion diagnostics", "companion diagnostic", "MGUS", "smoldering multiple myeloma", "BCMA"]
 
 # Output files
 OUTPUT_JSON = "filtered_feeds.json"
