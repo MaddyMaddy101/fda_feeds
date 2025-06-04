@@ -124,5 +124,41 @@
         "keywords": [
             "CDx"
         ]
+    },
+    {
+        "title": "Research shows new treatment could delay cancer progression in patients with high-risk smoldering multiple myeloma",
+        "summary": "A new treatment is showing promise for people with high-risk smoldering multiple myeloma (SMM). This precancerous condition can progress to active multiple myeloma, a type of blood cancer. High-risk SMM carries a higher likelihood of progression.",
+        "link": "https://www.sciencedaily.com/releases/2024/12/241210163409.htm",
+        "published": "Tue, 10 Dec 2024 16:34:09 EST",
+        "keywords": [
+            "smoldering multiple myeloma"
+        ]
+    },
+    {
+        "title": "Obesity linked to detection of blood cancer precursor",
+        "summary": "Individuals with obesity are more likely to have monoclonal gammopathy of undetermined significance (MGUS), a benign blood condition that often precedes multiple myeloma, according to new research.",
+        "link": "https://www.sciencedaily.com/releases/2024/01/240114202019.htm",
+        "published": "Sun, 14 Jan 2024 20:20:19 EST",
+        "keywords": [
+            "MGUS"
+        ]
+    },
+    {
+        "title": "Lenalidomide may delay onset of myeloma-related bone, organ damage",
+        "summary": "The largest randomized trial in asymptomatic patients with smoldering multiple myeloma suggests that lenalidomide, a cancer drug, may delay the onset of bone and other myeloma-related organ damage.",
+        "link": "https://www.sciencedaily.com/releases/2019/10/191028104212.htm",
+        "published": "Mon, 28 Oct 2019 10:42:12 EDT",
+        "keywords": [
+            "smoldering multiple myeloma"
+        ]
+    },
+    {
+        "title": "Blood cancer precursor found in 9/11 firefighters",
+        "summary": "A new study reports that New York City firefighters exposed to the 9/11 World Trade Center disaster site face an increased risk for developing myeloma precursor disease (MGUS), which can lead to the blood cancer multiple myeloma.",
+        "link": "https://www.sciencedaily.com/releases/2018/04/180426141507.htm",
+        "published": "Thu, 26 Apr 2018 14:15:07 EDT",
+        "keywords": [
+            "MGUS"
+        ]
     }
 ]
